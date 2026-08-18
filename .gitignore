@@ -1,0 +1,6 @@
+.DS_Store
+Thumbs.db
+.firestore-rules-analysis.md
+node_modules/
+.firebase/
+*.log

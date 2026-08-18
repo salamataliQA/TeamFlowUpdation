@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Siznam &amp; Co.</title>
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <script>document.documentElement.dataset.theme = localStorage.getItem("teamflow.theme") || "light";</script>
+</head>
+<body class="login-body">
+  <section class="login-art">
+    <div class="brand">
+      <div class="brand-mark">SC</div>
+      <div>
+        <h1>Siznam &amp; Co.</h1>
+        <p>Team Occupancy</p>
+      </div>
+    </div>
+    <div>
+      <h2 style="font-size:40px;letter-spacing:-0.05em;max-width:520px">See who is working on what in seconds.</h2>
+      <p style="color:#94a3b8;margin:16px 0 28px;max-width:460px">Replace the occupancy spreadsheet with live capacity, assignments, and audit history.</p>
+      <div class="login-preview" aria-hidden="true">
+        <div class="preview-row"><span>Haseeb Akram</span><strong>8 / 8h · Creatingly</strong></div>
+        <div class="preview-row"><span>Haseeb ul Hassan</span><strong>5 / 8h · 3h Available</strong></div>
+        <div class="preview-row"><span>Awais Aslam</span><strong>10 / 8h · 2h Over Capacity</strong></div>
+      </div>
+    </div>
+      <p style="color:#64748b">Internal occupancy tool for Siznam &amp; Co.</p>
+  </section>
+  <section class="login-panel">
+    <form class="login-card" id="login-form">
+      <h2>Welcome back</h2>
+      <p>Sign in to Siznam &amp; Co. occupancy.</p>
+      <div class="empty" id="inactive-banner" hidden>
+        <h3>Account Inactive</h3>
+        <p>Your account has been deactivated by an administrator. Please contact your administrator if you believe this is a mistake.</p>
+      </div>
+      <label class="field">
+        <span>Email</span>
+        <input name="email" type="email" autocomplete="username" required />
+      </label>
+      <label class="field" style="margin-top:12px">
+        <span>Password</span>
+        <input name="password" type="password" autocomplete="current-password" required />
+      </label>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0">
+        <button class="btn ghost" type="button" id="forgot-btn">Forgot password</button>
+      </div>
+      <button class="btn" type="submit" style="width:100%">Sign in</button>
+      <div class="demo-box" id="demo-box" hidden>
+        <strong>Demo mode is on.</strong>
+        <p>Firebase is not configured yet, so you can explore with local Excel data.</p>
+        <p>Admin: <code>admin@siznam.local</code> / <code>Siznam!admin</code></p>
+        <p>Manager: <code>manager@siznam.local</code> / <code>Siznam!manager</code></p>
+        <p>Member: <code>member@siznam.local</code> / <code>Siznam!member</code> (Abdul Rafay)</p>
+        <div class="actions" style="margin-top:10px">
+          <button class="btn secondary" type="button" id="fill-admin">Use admin</button>
+          <button class="btn secondary" type="button" id="fill-manager">Use manager</button>
+          <button class="btn secondary" type="button" id="fill-member">Use member</button>
+        </div>
+      </div>
+    </form>
+  </section>
+  <script src="https://unpkg.com/lucide@0.460.0"></script>
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>

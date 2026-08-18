@@ -1,0 +1,272 @@
+.occ-table {
+  overflow: visible;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.occ-table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.occ-head,
+.occ-row {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr 0.7fr 0.7fr 1fr 1.6fr 0.9fr 0.6fr;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.occ-head {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+}
+
+.occ-row {
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.occ-row:hover {
+  background: color-mix(in srgb, var(--primary-soft) 55%, var(--bg-elevated));
+}
+
+.member-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.member-cell strong,
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-cell small {
+  color: var(--text-secondary);
+  display: block;
+}
+
+.hours {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.util-cell {
+  display: grid;
+  gap: 6px;
+}
+
+.project-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.summary-strip {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.project-card {
+  padding: 18px;
+  cursor: pointer;
+  transition: 0.16s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.project-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.timeline {
+  display: grid;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 12px;
+}
+
+.timeline-item::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-soft);
+}
+
+.assign-card,
+.report-card {
+  padding: 16px;
+}
+
+.chart-bar {
+  display: grid;
+  grid-template-columns: 140px 1fr 52px;
+  gap: 10px;
+  align-items: center;
+  margin: 8px 0;
+  font-size: 13px;
+}
+
+.donut-wrap {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.legend {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.audit-table th,
+.audit-table td {
+  text-align: left;
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  vertical-align: top;
+}
+
+.audit-table th {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.notice-list {
+  max-width: 340px;
+  max-height: 360px;
+  overflow: auto;
+}
+
+.global-results {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  display: none;
+  z-index: 30;
+}
+
+.global-results.is-open {
+  display: block;
+}
+
+.global-results button {
+  width: 100%;
+  border: 0;
+  background: none;
+  text-align: left;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.global-results button:hover {
+  background: var(--bg-muted);
+}
+
+.date-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-field input {
+  min-height: 42px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 0 12px;
+}
+
+.remain {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.remain.ok { color: var(--success); }
+.remain.full { color: var(--warning); }
+.remain.over { color: var(--danger); }
+
+.action-menu { position: relative; z-index: 6; }
+.action-menu .menu { right: 0; left: auto; }
+
+.extra-accent { color: var(--extra, #4f46e5); }
+
+.sidebar-close {
+  display: none;
+  margin-left: auto;
+}
+
+body.nav-locked {
+  overflow: hidden;
+}
+
+.filters {
+  min-width: 0;
+}
+
+.filters input,
+.filters select {
+  min-width: 0;
+  max-width: 100%;
+}

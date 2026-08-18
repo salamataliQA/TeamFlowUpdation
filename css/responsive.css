@@ -1,0 +1,197 @@
+@media (max-width: 1280px) {
+  .kpi-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .occ-head,
+  .occ-row {
+    grid-template-columns: 1.3fr 0.8fr 1fr 1.4fr 0.8fr 0.5fr;
+  }
+
+  .occ-head span:nth-child(3),
+  .occ-head span:nth-child(4),
+  .occ-row > :nth-child(3),
+  .occ-row > :nth-child(4) {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .app-shell {
+    display: block;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-105%);
+    transition: transform 0.2s ease;
+    width: min(280px, 86vw);
+    z-index: 26;
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .sidebar.is-open {
+    transform: none;
+  }
+
+  .sidebar-close {
+    display: grid;
+  }
+
+  body.nav-locked {
+    overflow: hidden;
+  }
+
+  .topbar .search {
+    display: none;
+  }
+
+  .topbar .search.is-expanded {
+    display: block;
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: calc(var(--header-height) - 8px);
+    min-width: 0;
+    max-width: none;
+    z-index: 21;
+  }
+
+  .search-toggle,
+  .menu-btn {
+    display: grid;
+  }
+
+  .form-grid.two,
+  .capacity-preview {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-body {
+    grid-template-columns: 1fr;
+  }
+
+  .login-art {
+    display: none;
+  }
+
+  .topbar {
+    padding: 0 12px;
+    height: 64px;
+  }
+
+  .search {
+    min-width: 0;
+    max-width: none;
+  }
+
+  .user-chip span {
+    display: none;
+  }
+
+  .page {
+    padding: 16px 12px 32px;
+  }
+
+  .page-head,
+  .page-head .actions {
+    display: grid;
+    width: 100%;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .occ-head {
+    display: none;
+  }
+
+  .occ-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 10px;
+    background: var(--bg-elevated);
+  }
+
+  .occ-row > :nth-child(n) {
+    display: revert;
+  }
+
+  .occ-row .member-cell {
+    grid-column: 1 / -1;
+  }
+
+  .occ-row .util-cell,
+  .occ-row .project-stack {
+    grid-column: 1 / -1;
+  }
+
+  .occ-row [data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+  }
+
+  .capacity-preview,
+  .form-grid.two {
+    grid-template-columns: 1fr;
+  }
+
+  .audit-table thead {
+    display: none;
+  }
+
+  .audit-table tr {
+    display: grid;
+    gap: 4px;
+    padding: 12px 0;
+  }
+
+  .chart-bar {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .filters {
+    align-items: stretch;
+  }
+
+  .filters input,
+  .filters select,
+  .date-nav {
+    width: 100%;
+  }
+
+  .page-head .actions .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
