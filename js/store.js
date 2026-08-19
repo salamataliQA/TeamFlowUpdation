@@ -427,8 +427,13 @@ class FirestoreAdapter {
   }
 
   async getUserById(id) {
-    const snap = await getDoc(doc(db, "users", id));
-    return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+    try {
+      const snap = await getDoc(doc(db, "users", id));
+      return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+    } catch (error) {
+      console.error("Unable to load user profile", error);
+      return null;
+    }
   }
 
   async getMemberById(id) {

@@ -116,7 +116,7 @@ function extraHoursWidget(state, dateKey, extraMemberId = "") {
               .join("")
           : "<p>No extra hours recorded.</p>"
       }
-      ${canManageExtraHours() ? `<a class="btn ghost" href="extra-hours.html?range=this-week">View all</a>` : ""}
+      ${canManageExtraHours() ? `<a class="btn ghost" href="${pagePath("extra-hours.html?range=this-week")}">View all</a>` : ""}
     </section>`;
 }
 

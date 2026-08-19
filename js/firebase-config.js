@@ -17,7 +17,7 @@ export const firebaseConfig = {
 };
 
 /** Must match bootstrapEmail() in firestore.rules */
-export const BOOTSTRAP_ADMIN_EMAIL = "admin@siznam.local";
+export const BOOTSTRAP_ADMIN_EMAIL = "admin@siznam.co";
 
 export const isFirebaseConfigured = Boolean(
   firebaseConfig.apiKey &&

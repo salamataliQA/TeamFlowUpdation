@@ -111,6 +111,34 @@ export async function logAudit(action, extra = {}) {
   }
 }
 
+async function ensureUserProfile(firebaseUser) {
+  let profile = await store.getUserById(firebaseUser.uid);
+  if (
+    !profile &&
+    firebaseUser.email &&
+    firebaseUser.email.toLowerCase() === BOOTSTRAP_ADMIN_EMAIL.toLowerCase()
+  ) {
+    try {
+      await store.addUser(firebaseUser.uid, {
+        name: firebaseUser.displayName || "Admin",
+        email: firebaseUser.email,
+        role: "admin",
+        memberId: "",
+        permissions: {},
+        active: true,
+      });
+      profile = await store.getUserById(firebaseUser.uid);
+    } catch (error) {
+      console.error("Unable to create admin profile", error);
+      throw Object.assign(new Error("Unable to create your admin profile. Create a Firestore database, deploy security rules, and add this site to Authorized domains."), {
+        code: error.code || "profile-create-failed",
+        userSafe: true,
+      });
+    }
+  }
+  return profile;
+}
+
 export async function login(email, password) {
   if (!isFirebaseConfigured) {
     const user = store.getDemoUser(email.trim(), password);
@@ -128,22 +156,7 @@ export async function login(email, password) {
 
   await setPersistence(auth, browserLocalPersistence);
   const credential = await signInWithEmailAndPassword(auth, email.trim(), password);
-  let profile = await store.getUserById(credential.user.uid);
-  if (
-    !profile &&
-    credential.user.email &&
-    credential.user.email.toLowerCase() === BOOTSTRAP_ADMIN_EMAIL.toLowerCase()
-  ) {
-    await store.addUser(credential.user.uid, {
-      name: credential.user.displayName || "Admin",
-      email: credential.user.email,
-      role: "admin",
-      memberId: "",
-      permissions: {},
-      active: true,
-    });
-    profile = await store.getUserById(credential.user.uid);
-  }
+  const profile = await ensureUserProfile(credential.user);
   if (!profile) {
     await signOut(auth);
     throw new Error("This account has not been provisioned. Ask an admin to create your Siznam & Co. profile.");
@@ -205,7 +218,7 @@ export async function createAuthUser(email, password, profile) {
 }
 
 export function requireAuth() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     if (!isFirebaseConfigured) {
       currentUser = readDemoSession();
       emitUser();
@@ -217,26 +230,31 @@ export function requireAuth() {
       return;
     }
 
+    if (!auth) {
+      reject(new Error("Firebase Auth is not initialized."));
+      return;
+    }
+
     onAuthStateChanged(auth, async (firebaseUser) => {
-      if (!firebaseUser) {
-        currentUser = null;
-        window.location.href = pagePath("login.html");
-        return;
-      }
-      const profile = await store.getUserById(firebaseUser.uid);
-      if (!profile || profile.active === false) {
-        await rejectInactiveSession();
-        return;
-      }
-      currentUser = { ...profile, id: firebaseUser.uid, email: firebaseUser.email };
       try {
+        if (!firebaseUser) {
+          currentUser = null;
+          window.location.href = pagePath("login.html");
+          return;
+        }
+        const profile = await ensureUserProfile(firebaseUser);
+        if (!profile || profile.active === false) {
+          await rejectInactiveSession();
+          return;
+        }
+        currentUser = { ...profile, id: firebaseUser.uid, email: firebaseUser.email };
         await assertAccountActive(currentUser);
-      } catch {
-        await rejectInactiveSession();
-        return;
+        emitUser();
+        resolve(currentUser);
+      } catch (error) {
+        console.error(error);
+        reject(error);
       }
-      emitUser();
-      resolve(currentUser);
     });
   });
 }

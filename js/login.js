@@ -1,5 +1,4 @@
-import { DEMO_CREDENTIALS } from "./constants.js";
-import { isFirebaseConfigured } from "./firebase-config.js";
+import { BOOTSTRAP_ADMIN_EMAIL } from "./firebase-config.js";
 import { login, redirectIfLoggedIn, resetPassword, ACCOUNT_INACTIVE_MESSAGE } from "./auth.js";
 import { showToast } from "./components.js";
 import { applyTheme, getStoredTheme, pagePath, refreshIcons, setButtonLoading } from "./utils.js";
@@ -10,9 +9,6 @@ refreshIcons();
 
 const form = document.querySelector("#login-form");
 const resetBtn = document.querySelector("#forgot-btn");
-const demoBox = document.querySelector("#demo-box");
-
-if (!isFirebaseConfigured && demoBox) demoBox.hidden = false;
 
 if (new URLSearchParams(location.search).get("reason") === "inactive") {
   const banner = document.querySelector("#inactive-banner");
@@ -40,8 +36,16 @@ form?.addEventListener("submit", async (event) => {
       "auth/user-not-found": "No account found for that email.",
       "auth/wrong-password": "Invalid email or password.",
       "auth/too-many-requests": "Too many attempts. Try again later.",
+      "auth/configuration-not-found":
+        "Firebase Authentication is not fully enabled for this site. Enable Email/Password and add this Vercel domain under Authentication → Settings → Authorized domains.",
+      "auth/unauthorized-domain":
+        "This Vercel URL is not in Firebase authorized domains. Add it under Authentication → Settings → Authorized domains.",
+      "auth/operation-not-allowed": "Email/Password sign-in is disabled in Firebase Authentication.",
+      "auth/invalid-api-key": "Firebase API key is invalid.",
+      "auth/network-request-failed": "Network error. Check your connection and try again.",
     };
-    showToast(map[error.code] || error.message || "Unable to sign in.", "error");
+    showToast(map[error.code] || "Unable to sign in.", "error");
+    console.error(error);
   } finally {
     setButtonLoading(button, false);
   }
@@ -59,14 +63,6 @@ resetBtn?.addEventListener("click", async () => {
 });
 
 document.querySelector("#fill-admin")?.addEventListener("click", () => {
-  form.email.value = DEMO_CREDENTIALS.admin.email;
-  form.password.value = DEMO_CREDENTIALS.admin.password;
-});
-document.querySelector("#fill-manager")?.addEventListener("click", () => {
-  form.email.value = DEMO_CREDENTIALS.manager.email;
-  form.password.value = DEMO_CREDENTIALS.manager.password;
-});
-document.querySelector("#fill-member")?.addEventListener("click", () => {
-  form.email.value = DEMO_CREDENTIALS.member.email;
-  form.password.value = DEMO_CREDENTIALS.member.password;
+  form.email.value = BOOTSTRAP_ADMIN_EMAIL;
+  form.password.focus();
 });

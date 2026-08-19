@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Siznam &amp; Co.</title>
-  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/main.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/dashboard.css" />
-  <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
   <script>document.documentElement.dataset.theme = localStorage.getItem("teamflow.theme") || "light";</script>
 </head>
 <body class="login-body">
@@ -54,21 +54,17 @@
         <button class="btn ghost" type="button" id="forgot-btn">Forgot password</button>
       </div>
       <button class="btn" type="submit" style="width:100%">Sign in</button>
-      <div class="demo-box" id="demo-box" hidden>
-        <strong>Demo mode is on.</strong>
-        <p>Firebase is not configured yet, so you can explore with local Excel data.</p>
-        <p>Admin: <code>admin@siznam.local</code> / <code>Siznam!admin</code></p>
-        <p>Manager: <code>manager@siznam.local</code> / <code>Siznam!manager</code></p>
-        <p>Member: <code>member@siznam.local</code> / <code>Siznam!member</code> (Abdul Rafay)</p>
+      <div class="demo-box" id="demo-box">
+        <strong>Admin account</strong>
+        <p>Email: <code>admin@siznam.co</code></p>
+        <p>Use the password set in Firebase Authentication.</p>
         <div class="actions" style="margin-top:10px">
-          <button class="btn secondary" type="button" id="fill-admin">Use admin</button>
-          <button class="btn secondary" type="button" id="fill-manager">Use manager</button>
-          <button class="btn secondary" type="button" id="fill-member">Use member</button>
+          <button class="btn secondary" type="button" id="fill-admin">Fill admin email</button>
         </div>
       </div>
     </form>
   </section>
   <script src="https://unpkg.com/lucide@0.460.0"></script>
-  <script type="module" src="js/login.js"></script>
+  <script type="module" src="/js/login.js"></script>
 </body>
 </html>

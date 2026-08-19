@@ -195,17 +195,29 @@ export function validateRequired(value, label) {
 }
 
 export function assetPath(path) {
-  const inPages = /\/pages\//.test(window.location.pathname);
-  return inPages ? `../${path}` : path;
+  return `/${String(path).replace(/^\//, "")}`;
 }
+
+const PAGE_ROUTES = {
+  "login.html": "/login",
+  "dashboard.html": "/dashboard",
+  "team.html": "/team",
+  "projects.html": "/projects",
+  "assignments.html": "/assignments",
+  "reports.html": "/reports",
+  "extra-hours.html": "/extra-hours",
+  "audit-logs.html": "/audit-logs",
+  "settings.html": "/settings",
+};
 
 export function pagePath(file) {
   const queryIndex = file.indexOf("?");
   const path = queryIndex >= 0 ? file.slice(0, queryIndex) : file;
   const query = queryIndex >= 0 ? file.slice(queryIndex) : "";
-  const inPages = /\/pages\//.test(window.location.pathname);
-  if (path === "login.html") return `${inPages ? "../login.html" : "login.html"}${query}`;
-  return `${inPages ? path : `pages/${path}`}${query}`;
+  const route = PAGE_ROUTES[path];
+  if (route) return `${route}${query}`;
+  const clean = String(path).replace(/\.html$/i, "").replace(/^pages\//, "");
+  return `/${clean}${query}`;
 }
 
 export function applyTheme(theme) {
