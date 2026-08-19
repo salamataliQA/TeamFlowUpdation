@@ -210,6 +210,18 @@ const PAGE_ROUTES = {
   "settings.html": "/settings",
 };
 
+export function withTimeout(promise, ms, message = "Request timed out.") {
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        reject(Object.assign(new Error(message), { code: "timeout" }));
+      }, ms);
+    }),
+  ]).finally(() => clearTimeout(timer));
+}
+
 export function pagePath(file) {
   const queryIndex = file.indexOf("?");
   const path = queryIndex >= 0 ? file.slice(0, queryIndex) : file;

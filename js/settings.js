@@ -1,12 +1,9 @@
-import { requireAdmin } from "./auth.js";
+import { startAuthenticatedPage } from "./boot.js";
 import { bootTheme } from "./layout.js";
 import { SettingsPage } from "./pages/SettingsPage.js";
 
 bootTheme();
 
-async function main() {
-  await requireAdmin();
+startAuthenticatedPage(async () => {
   await new SettingsPage("#app").init();
-}
-
-main();
+}, { admin: true });

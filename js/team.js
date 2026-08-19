@@ -1,12 +1,9 @@
-import { requireStaff } from "./auth.js";
+import { startAuthenticatedPage } from "./boot.js";
 import { bootTheme } from "./layout.js";
 import { TeamPage } from "./pages/TeamPage.js";
 
 bootTheme();
 
-async function main() {
-  await requireStaff();
+startAuthenticatedPage(() => {
   new TeamPage("#app").init();
-}
-
-main();
+}, { staff: true });

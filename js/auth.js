@@ -12,7 +12,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebas
 import { AUDIT_ACTIONS, DEMO_CREDENTIALS } from "./constants.js";
 import { auth, firebaseConfig, isFirebaseConfigured, BOOTSTRAP_ADMIN_EMAIL } from "./firebase-config.js";
 import { store } from "./store.js";
-import { pagePath } from "./utils.js";
+import { pagePath, withTimeout } from "./utils.js";
+
+const AUTH_READY_TIMEOUT_MS = 10000;
+const PROFILE_TIMEOUT_MS = 10000;
 
 const SESSION_KEY = "teamflow.session";
 let currentUser = null;
@@ -217,46 +220,101 @@ export async function createAuthUser(email, password, profile) {
   return { id: credential.user.uid, email, ...profile };
 }
 
-export function requireAuth() {
-  return new Promise((resolve, reject) => {
-    if (!isFirebaseConfigured) {
-      currentUser = readDemoSession();
-      emitUser();
-      if (!currentUser) {
-        window.location.href = pagePath("login.html");
-        return;
-      }
-      assertAccountActive(currentUser).then(() => resolve(currentUser)).catch(() => rejectInactiveSession());
-      return;
-    }
+async function waitForFirebaseUser() {
+  const ready = typeof auth.authStateReady === "function"
+    ? auth.authStateReady()
+    : new Promise((resolve, reject) => {
+        const unsub = onAuthStateChanged(
+          auth,
+          () => {
+            unsub();
+            resolve();
+          },
+          reject
+        );
+      });
+  await withTimeout(
+    ready,
+    AUTH_READY_TIMEOUT_MS,
+    "Firebase Auth did not respond. Add team-flow-updation.vercel.app under Authentication → Settings → Authorized domains."
+  );
+  return auth.currentUser;
+}
 
-    if (!auth) {
-      reject(new Error("Firebase Auth is not initialized."));
-      return;
+export async function requireAuth() {
+  if (!isFirebaseConfigured) {
+    currentUser = readDemoSession();
+    emitUser();
+    if (!currentUser) {
+      window.location.replace(pagePath("login.html"));
+      return new Promise(() => {});
     }
+    try {
+      await assertAccountActive(currentUser);
+      return currentUser;
+    } catch {
+      await rejectInactiveSession();
+      return new Promise(() => {});
+    }
+  }
 
-    onAuthStateChanged(auth, async (firebaseUser) => {
-      try {
-        if (!firebaseUser) {
-          currentUser = null;
-          window.location.href = pagePath("login.html");
-          return;
-        }
-        const profile = await ensureUserProfile(firebaseUser);
-        if (!profile || profile.active === false) {
-          await rejectInactiveSession();
-          return;
-        }
-        currentUser = { ...profile, id: firebaseUser.uid, email: firebaseUser.email };
-        await assertAccountActive(currentUser);
-        emitUser();
-        resolve(currentUser);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-    });
-  });
+  if (!auth) {
+    throw Object.assign(new Error("Firebase Auth is not initialized."), { code: "auth-uninitialized", userSafe: true });
+  }
+
+  let firebaseUser;
+  try {
+    firebaseUser = await waitForFirebaseUser();
+  } catch (error) {
+    throw Object.assign(
+      new Error(
+        "Firebase Auth did not respond. Add team-flow-updation.vercel.app under Authentication → Settings → Authorized domains, and confirm Email/Password is enabled."
+      ),
+      { code: "auth-timeout", userSafe: true, cause: error }
+    );
+  }
+
+  if (!firebaseUser) {
+    currentUser = null;
+    window.location.replace(pagePath("login.html"));
+    return new Promise(() => {});
+  }
+
+  let profile;
+  try {
+    profile = await withTimeout(
+      ensureUserProfile(firebaseUser),
+      PROFILE_TIMEOUT_MS,
+      "Could not load your profile. Create a Cloud Firestore database for project teamflowupdation and deploy security rules."
+    );
+  } catch (error) {
+    throw Object.assign(
+      new Error(
+        error.userSafe
+          ? error.message
+          : "Could not load your profile. Create a Cloud Firestore database for project teamflowupdation and deploy security rules."
+      ),
+      { code: error.code || "profile-timeout", userSafe: true, cause: error }
+    );
+  }
+
+  if (!profile || profile.active === false) {
+    await rejectInactiveSession();
+    return new Promise(() => {});
+  }
+
+  currentUser = { ...profile, id: firebaseUser.uid, email: firebaseUser.email };
+  try {
+    await assertAccountActive(currentUser);
+  } catch (error) {
+    if (error?.code === "account-inactive") {
+      await rejectInactiveSession();
+      return new Promise(() => {});
+    }
+    throw error;
+  }
+  emitUser();
+  return currentUser;
 }
 
 export function redirectIfLoggedIn() {

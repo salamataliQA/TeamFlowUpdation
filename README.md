@@ -83,9 +83,10 @@ Firebase Hosting URL: https://teamflowupdation.web.app
 ### First-time console steps
 
 1. Enable **Authentication → Sign-in method → Email/Password**.
-2. Create a **Firestore** database (production mode is fine; rules are deployed from this repo).
-3. Create the first Auth user: `admin@siznam.local` / `Siznam!admin` (must match `BOOTSTRAP_ADMIN_EMAIL` and `bootstrapEmail()` in `firestore.rules`).
-4. Deploy rules, indexes, and Hosting:
+2. Create a **Firestore** database (Native mode, production rules are fine; this repo deploys `firestore.rules`).
+3. Create the first Auth user with email **`admin@siznam.co`** (must match `BOOTSTRAP_ADMIN_EMAIL` and `bootstrapEmail()` in `firestore.rules`).
+4. Add these **Authorized domains** (Authentication → Settings): `localhost`, `team-flow-updation.vercel.app`, `teamflowupdation.web.app`. Without the Vercel domain, `/dashboard` hangs at “Loading dashboard...”.
+5. Deploy rules, indexes, and Hosting:
 
 ```bash
 npx -y firebase-tools@latest login
@@ -93,12 +94,16 @@ npx -y firebase-tools@latest use teamflowupdation
 npx -y firebase-tools@latest deploy --only firestore:rules,firestore:indexes,hosting
 ```
 
-5. Sign in once as that admin. The rules allow that email to create its own `users/{uid}` admin profile.
-6. In **Settings**, load demo data into Firestore if you want the sample roster.
+6. Sign in once as that admin. The rules allow that email to create its own `users/{uid}` admin profile.
+7. In **Settings**, load demo data into Firestore if you want the sample roster.
 
 ### Vercel
 
-Framework Preset **Other**, Root Directory `./` (this folder contains `index.html`). Do not add Firebase keys as Vercel env vars — this app has no build step to inject them. After the Vercel URL exists, add it under Firebase Authentication → Settings → Authorized domains.
+Framework Preset **Other**, Root Directory `./` (this folder contains `index.html`). Do not add Firebase keys as Vercel env vars — this app has no build step to inject them.
+
+Production URL: https://team-flow-updation.vercel.app
+
+Use that host, not `*.vercel.app` preview URLs. After it exists, add **`team-flow-updation.vercel.app`** (no `https://`) under Firebase Authentication → Settings → Authorized domains.
 
 Frontend hiding is not the only control: Firestore rules also enforce Admin / Manager / Member, `manageExtraHours`, `assignMember`, and the other permission flags. Role is stored on `users/{uid}` (not Auth custom claims).
 

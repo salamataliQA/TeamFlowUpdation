@@ -1,12 +1,9 @@
-import { requireAuth } from "./auth.js";
+import { startAuthenticatedPage } from "./boot.js";
 import { bootTheme } from "./layout.js";
 import { AssignmentsPage } from "./pages/AssignmentsPage.js";
 
 bootTheme();
 
-async function main() {
-  await requireAuth();
+startAuthenticatedPage(() => {
   new AssignmentsPage("#app").init();
-}
-
-main();
+});

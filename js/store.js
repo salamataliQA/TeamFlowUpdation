@@ -20,7 +20,7 @@ import {
 import { AUDIT_PAGE_SIZE } from "./constants.js";
 import { db, isFirebaseConfigured } from "./firebase-config.js";
 import { createDemoState } from "./seed-data.js";
-import { uid } from "./utils.js";
+import { uid, withTimeout } from "./utils.js";
 
 const DEMO_KEY = "teamflow.demo.v2";
 const listeners = new Set();
@@ -260,10 +260,12 @@ class FirestoreAdapter {
         defaultManagerPermissions: {},
         updatedBy: "system",
       },
+      error: null,
     };
     this.unsubscribers = [];
     this.readyCount = 0;
     this.expectedReady = 5;
+    this.loadTimer = null;
   }
 
   snapshot() {
@@ -280,36 +282,76 @@ class FirestoreAdapter {
   markReady() {
     this.readyCount += 1;
     if (this.readyCount >= this.expectedReady) {
+      clearTimeout(this.loadTimer);
       this.cache.loading = false;
+      this.cache.error = null;
       emit(this.snapshot());
     }
+  }
+
+  failListeners(error) {
+    clearTimeout(this.loadTimer);
+    console.error("Firestore listener failed", error);
+    this.cache.loading = false;
+    const messages = {
+      "permission-denied": "You don't have permission to load occupancy data.",
+      "firestore-timeout":
+        error.message ||
+        "Firestore did not respond. Create a Cloud Firestore database for project teamflowupdation and deploy security rules.",
+      "not-found": "Firestore database was not found. Create the default database for project teamflowupdation.",
+      unimplemented: "Firestore is not enabled. Create the default database for project teamflowupdation.",
+    };
+    this.cache.error = {
+      code: error.code || "firestore-error",
+      message:
+        messages[error.code] ||
+        "Firestore is not available. Create the default database for project teamflowupdation and deploy security rules.",
+    };
+    emit(this.snapshot());
   }
 
   ensureListeners(options = {}) {
     if (this.unsubscribers.length) return;
     const memberId = options.memberId;
     this.expectedReady = memberId ? 3 : 5;
+    this.loadTimer = setTimeout(() => {
+      if (!this.cache.loading) return;
+      this.failListeners({
+        code: "firestore-timeout",
+        message: "Firestore did not respond. Create a Cloud Firestore database for project teamflowupdation and deploy security rules.",
+      });
+    }, 12000);
+
+    const onError = (error) => this.failListeners(error);
 
     const bindQuery = (ref, key) =>
-      onSnapshot(ref, (snap) => {
-        if (typeof snap.exists === "function") {
-          this.cache[key] = snap.exists() ? [{ id: snap.id, ...snap.data() }] : [];
-        } else {
-          this.cache[key] = snap.docs.map((item) => ({ id: item.id, ...item.data() }));
-        }
-        emit(this.snapshot());
-        if (this.cache.loading) this.markReady();
-      });
+      onSnapshot(
+        ref,
+        (snap) => {
+          if (typeof snap.exists === "function") {
+            this.cache[key] = snap.exists() ? [{ id: snap.id, ...snap.data() }] : [];
+          } else {
+            this.cache[key] = snap.docs.map((item) => ({ id: item.id, ...item.data() }));
+          }
+          emit(this.snapshot());
+          if (this.cache.loading) this.markReady();
+        },
+        onError
+      );
 
     if (memberId) {
       this.unsubscribers.push(bindQuery(doc(db, "teamMembers", memberId), "members"));
       this.unsubscribers.push(
-        onSnapshot(query(collection(db, "assignments"), where("memberId", "==", memberId)), async (snap) => {
-          this.cache.assignments = snap.docs.map((item) => ({ id: item.id, ...item.data() }));
-          await this.hydrateProjects(this.cache.assignments);
-          emit(this.snapshot());
-          if (this.cache.loading) this.markReady();
-        })
+        onSnapshot(
+          query(collection(db, "assignments"), where("memberId", "==", memberId)),
+          async (snap) => {
+            this.cache.assignments = snap.docs.map((item) => ({ id: item.id, ...item.data() }));
+            await this.hydrateProjects(this.cache.assignments);
+            emit(this.snapshot());
+            if (this.cache.loading) this.markReady();
+          },
+          onError
+        )
       );
       this.unsubscribers.push(
         bindQuery(query(collection(db, "extraHours"), where("memberId", "==", memberId)), "extraHours")
@@ -320,11 +362,15 @@ class FirestoreAdapter {
       this.unsubscribers.push(bindQuery(collection(db, "assignments"), "assignments"));
       this.unsubscribers.push(bindQuery(collection(db, "extraHours"), "extraHours"));
       this.unsubscribers.push(
-        onSnapshot(doc(db, "settings", "app"), (snap) => {
-          if (snap.exists()) this.cache.settings = { id: snap.id, ...snap.data() };
-          emit(this.snapshot());
-          if (this.cache.loading) this.markReady();
-        })
+        onSnapshot(
+          doc(db, "settings", "app"),
+          (snap) => {
+            if (snap.exists()) this.cache.settings = { id: snap.id, ...snap.data() };
+            emit(this.snapshot());
+            if (this.cache.loading) this.markReady();
+          },
+          onError
+        )
       );
     }
   }
@@ -428,17 +474,23 @@ class FirestoreAdapter {
 
   async getUserById(id) {
     try {
-      const snap = await getDoc(doc(db, "users", id));
+      const snap = await withTimeout(getDoc(doc(db, "users", id)), 8000, "Timed out loading your profile.");
       return snap.exists() ? { id: snap.id, ...snap.data() } : null;
     } catch (error) {
+      if (error.code === "timeout") throw error;
       console.error("Unable to load user profile", error);
       return null;
     }
   }
 
   async getMemberById(id) {
-    const snap = await getDoc(doc(db, "teamMembers", id));
-    return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+    try {
+      const snap = await withTimeout(getDoc(doc(db, "teamMembers", id)), 8000, "Timed out loading team member.");
+      return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+    } catch (error) {
+      console.error("Unable to load team member", error);
+      return null;
+    }
   }
 
   async listUsers() {

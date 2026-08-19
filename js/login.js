@@ -10,8 +10,13 @@ refreshIcons();
 const form = document.querySelector("#login-form");
 const resetBtn = document.querySelector("#forgot-btn");
 
-if (new URLSearchParams(location.search).get("reason") === "inactive") {
+const loginReason = new URLSearchParams(location.search).get("reason");
+if (loginReason === "inactive") {
   const banner = document.querySelector("#inactive-banner");
+  if (banner) banner.hidden = false;
+}
+if (loginReason === "auth-timeout" || loginReason === "unauthorized-domain") {
+  const banner = document.querySelector("#setup-banner");
   if (banner) banner.hidden = false;
 }
 

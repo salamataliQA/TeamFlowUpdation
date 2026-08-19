@@ -168,6 +168,13 @@ function pageMarkup(state, ui) {
     ? computeAllMemberStats([selected], state.assignments, extraHours, ui.dateKey)[0]
     : null;
 
+  const dataBanner = state.error
+    ? `<div class="empty card" style="margin-bottom:16px">
+        <h3>Live data is unavailable</h3>
+        <p>${escapeHtml(state.error.message || "Firestore did not respond. Create a database for teamflowupdation and deploy security rules.")}</p>
+      </div>`
+    : "";
+
   return `
     <div class="page-head">
       <div>
@@ -176,6 +183,7 @@ function pageMarkup(state, ui) {
       </div>
       <div class="actions">${pageActions()}</div>
     </div>
+    ${dataBanner}
     <div class="filters">
       ${dateNavHtml(ui.dateKey, formatDateKey(ui.dateKey))}
       <label class="select">
