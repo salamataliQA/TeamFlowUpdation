@@ -125,7 +125,8 @@ Admin always has every permission. Only Admin can add extra hours unless `manage
 .
 ├── index.html
 ├── login.html
-├── pages/
+├── dashboard.html
+├── team.html
 ├── css/
 ├── js/
 │   ├── pages/
