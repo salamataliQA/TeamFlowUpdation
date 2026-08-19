@@ -1,21 +1,9 @@
 {
+  "framework": null,
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/login.html", "destination": "/login", "permanent": false },
-    { "source": "/pages/:page.html", "destination": "/:page", "permanent": false }
-  ],
-  "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/dashboard", "destination": "/pages/dashboard.html" },
-    { "source": "/team", "destination": "/pages/team.html" },
-    { "source": "/projects", "destination": "/pages/projects.html" },
-    { "source": "/assignments", "destination": "/pages/assignments.html" },
-    { "source": "/reports", "destination": "/pages/reports.html" },
-    { "source": "/extra-hours", "destination": "/pages/extra-hours.html" },
-    { "source": "/audit-logs", "destination": "/pages/audit-logs.html" },
-    { "source": "/settings", "destination": "/pages/settings.html" }
+    { "source": "/pages/:path*", "destination": "/:path*", "permanent": false }
   ],
   "headers": [
     {

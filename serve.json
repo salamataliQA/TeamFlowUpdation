@@ -1,13 +1,14 @@
 {
+  "cleanUrls": true,
   "rewrites": [
     { "source": "/login", "destination": "/login.html" },
-    { "source": "/dashboard", "destination": "/pages/dashboard.html" },
-    { "source": "/team", "destination": "/pages/team.html" },
-    { "source": "/projects", "destination": "/pages/projects.html" },
-    { "source": "/assignments", "destination": "/pages/assignments.html" },
-    { "source": "/reports", "destination": "/pages/reports.html" },
-    { "source": "/extra-hours", "destination": "/pages/extra-hours.html" },
-    { "source": "/audit-logs", "destination": "/pages/audit-logs.html" },
-    { "source": "/settings", "destination": "/pages/settings.html" }
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/team", "destination": "/team.html" },
+    { "source": "/projects", "destination": "/projects.html" },
+    { "source": "/assignments", "destination": "/assignments.html" },
+    { "source": "/reports", "destination": "/reports.html" },
+    { "source": "/extra-hours", "destination": "/extra-hours.html" },
+    { "source": "/audit-logs", "destination": "/audit-logs.html" },
+    { "source": "/settings", "destination": "/settings.html" }
   ]
 }
